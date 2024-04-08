@@ -7,14 +7,48 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <link rel="stylesheet" href="./style.css">
 	<!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3EWCZHDCG9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <style>
+        body {
+            background-color: #ffe6f2; /* Colore di sfondo rosa chiaro */
+            margin: 0;
+            font-family: Arial, sans-serif; /* Font generico */
+        }
 
-      gtag('config', 'G-3EWCZHDCG9');
-    </script>
+        @keyframes heartfade {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .heart {
+            z-index: 999;
+            animation: heartfade 6s linear;
+            position: absolute;
+        }
+
+        .heart:before,
+        .heart:after {
+            content: "";
+            background-color: #ff3366; /* Colore rosso */
+            position: absolute;
+            height: 30px;
+            width: 45px;
+            border-radius: 15px 0px 0px 15px;
+        }
+
+        .heart:before {
+            transform: rotate(45deg);
+        }
+
+        .heart:after {
+            left: 10.5px;
+            transform: rotate(135deg);
+        }
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3EWCZHDCG9"></script>
   </head>
   <body>
         <div id="ask" class="container">
@@ -78,6 +112,71 @@
             document.getElementById('noButton').style.top = `${y}px`;
             playAudio();
         }
+        var brd = document.createElement("DIV");
+    document.body.insertBefore(brd, document.getElementById("board"));
+
+    const duration = 3000;
+    const speed = 0.5;
+    const cursorXOffset = 0;
+    const cursorYOffset = -5;
+
+    var hearts = [];
+
+    function generateHeart(x, y, xBound, xStart, scale) {
+        var heart = document.createElement("DIV");
+        heart.setAttribute('class', 'heart');
+        brd.appendChild(heart);
+        heart.time = duration;
+        heart.x = x;
+        heart.y = y;
+        heart.bound = xBound;
+        heart.direction = xStart;
+        heart.style.left = heart.x + "px";
+        heart.style.top = heart.y + "px";
+        heart.scale = scale;
+        heart.style.transform = "scale(" + scale + "," + scale + ")";
+        if (hearts == null)
+            hearts = [];
+        hearts.push(heart);
+        return heart;
+    }
+    
+
+    var before = Date.now();
+    var id = setInterval(frame, 5);
+    var gr = setInterval(check, 100);
+
+    function frame() {
+        var current = Date.now();
+        var deltaTime = current - before;
+        before = current;
+        for (i in hearts) {
+            var heart = hearts[i];
+            heart.time -= deltaTime;
+            if (heart.time > 0) {
+                heart.y -= speed;
+                heart.style.top = heart.y + "px";
+                heart.style.left = heart.x + heart.direction * heart.bound * Math.sin(heart.y * heart.scale / 30) / heart.y * 200 + "px";
+            } else {
+                heart.parentNode.removeChild(heart);
+                hearts.splice(i, 1);
+            }
+        }
+    }
+
+    function check() {
+        var start = 1 - Math.round(Math.random()) * 2;
+        var scale = Math.random() * Math.random() * 0.8 + 0.2;
+        var bound = 30 + Math.random() * 20;
+        var x = Math.random() * window.innerWidth;
+        var y = Math.random() * window.innerHeight;
+        generateHeart(x, y, bound, start, scale);
+    }
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3EWCZHDCG9');
 
     </script> 
 </html>
